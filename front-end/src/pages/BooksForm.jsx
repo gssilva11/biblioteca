@@ -10,36 +10,34 @@ import Waiting from '../components/ui/Waiting'
 import Notification from '../components/ui/Notification'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
-import InputMask from 'react-input-mask'
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers'
-import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
-import ptLocale from 'date-fns/locale/pt-BR'
-import { parseISO } from 'date-fns'
-import { FormControlLabel, Switch } from '@mui/material'
-import InputAdornment from '@mui/material/InputAdornment'
-import Car from '../models/car'
+// import InputMask from 'react-input-mask'
+// import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers'
+// import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
+// import ptLocale from 'date-fns/locale/pt-BR'
+// import { parseISO } from 'date-fns'
+// import { FormControlLabel, Switch } from '@mui/material'
+// import InputAdornment from '@mui/material/InputAdornment'
+
+// import bookModel from '../models/book'
 import { ZodError } from 'zod'
 
 
-export default function CarForm() {
+export default function BookForm() {
 
   const navigate = useNavigate()
   const params = useParams()
 
-  const carDefaults = {
-    brand: '',
-    model: '',
-    color: '',
-    year_manufacture: '',
-    imported: false,
-    plates: '',
-    selling_price: '',
-    customer_id: ''
+  const bookDefaults = {
+    title: '',
+    author: '',
+    year: '',
+    belongs_to: '',
+    status: ''
   }
 
   const [state, setState] = React.useState({
-    car: carDefaults, 
-    customers: [],   
+    book: bookDefaults, 
+    pubhisher_id: [],   
     showWaiting: false,
     notification: {
       show: false,
@@ -51,34 +49,36 @@ export default function CarForm() {
   })
 
   const {
-    car,
-    customers,
+    book,
+    // publisher_id,
     showWaiting,
     notification,
     openDialog,
     isFormModified
   } = state
   
-  const maskFormChars = {
-    '9': '[0-9]',
-    'A': '[A-Za-z]',
-    '*': '[A-Za-z0-9]',
-    '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
-    '_': '[\s0-9]'
-  }
+  // const maskFormChars = {
+  //   '9': '[0-9]',
+  //   'A': '[A-Za-z]',
+  //   '*': '[A-Za-z0-9]',
+  //   '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
+  //   '_': '[\s0-9]'
+  // }
   
-  const years = []
+  const statusBook = ['AVAILABLE', 'RESERVED', 'BORROWED']
 
+
+  const years = []
   // Anos, do mais recente ao mais antigo
-  for(let year = 2023; year >= 1940; year--) years.push(year)
+  for(let year = 2023; year >= 2000; year--) years.push(year)
 
   // useEffect com vetor de dependências vazio. Será executado
   // uma vez, quando o componente for carregado
   React.useEffect(() => {
-    // Verifica se existe o parâmetro id na rota.
+    // Verifica se existe o parâmetro code na rota.
     // Caso exista, chama a função fetchData() para carregar
     // os dados indicados pelo parâmetro para edição
-    fetchData(params.id)
+    fetchData(params.code)
   }, [])
 
   async function fetchData(isUpdating) {
@@ -87,24 +87,25 @@ export default function CarForm() {
     setState({ ...state, showWaiting: true })
     try {
 
-      let car = carDefaults
+      let book = bookDefaults
 
       // Se estivermos no modo de atualização, devemos carregar o
       // registro indicado no parâmetro da rota 
       if(isUpdating) {
-        car = await myfetch.get(`car/${params.id}`)
-        car.selling_date = parseISO(car.selling_date)
+        book = await myfetch.get(`book/${params.code}`)
+        // book.selling_date = parseISO(book.selling_date)
       }
 
-      // Busca a listagem de clientes para preencher o componente
-      // de escolha
-      let customers = await myfetch.get('customer')
+      // // Busca a listagem de clientes para preencher o componente
+      // // de escolha
+      // let publisher_id = await myfetch.get('publisher_id')
 
-      // Cria um cliente "fake" que permite não selecionar nenhum
-      // cliente
-      customers.unshift({id: null, name: '(Nenhum cliente)'})
+      // // Cria um cliente "fake" que permite não selecionar nenhum
+      // // cliente
+      // publisher_id.unshift({id: null, name_publisher: '(Sem Editora)'})
 
-      setState({ ...state, showWaiting: false, car, customers })
+      // setState({ ...state, showWaiting: false, book, publisher_id })
+      setState({ ...state, showWaiting: false, book})
 
     } 
     catch(error) {
@@ -120,17 +121,12 @@ export default function CarForm() {
   }
 
   function handleFieldChange(event) {
-    const newCar = { ...car }
-    
-    if (event.target.name === 'imported'){
-      newCar[event.target.name] = event.target.checked
-    } else {
-      newCar[event.target.name] = event.target.value
-    }
+    const newBook = { ...book }
+    newBook[event.target.name] = event.target.value
 
     setState({ 
       ...state, 
-      car: newCar,
+      book: newBook,
       isFormModified: true      // O formulário foi alterado
     })
   }
@@ -141,16 +137,16 @@ export default function CarForm() {
   
     try {
 
-      console.log({car})
+      console.log({book})
 
       // Chama a validação da biblioteca Zod
-      Car.parse(car)
+      // book.parse(book)
 
       let result 
       // se id então put para atualizar
-      if(car.id) result = await myfetch.put(`car/${car.id}`, car)
+      if(book.code) result = await myfetch.put(`book/${book.code}`, book)
       //senão post para criar novo 
-      else result = await myfetch.post('car', car)
+      else result = await myfetch.post('book', book)
       setState({ ...state, 
         showWaiting: false, // Esconde o backdrop
         notification: {
@@ -249,7 +245,7 @@ export default function CarForm() {
       /> 
 
       <Typography variant="h1" sx={{ mb: '50px' }}>
-        Cadastro de carros
+        Cadastro de Livros
       </Typography>
 
       <form onSubmit={handleFormSubmit}>
@@ -257,51 +253,39 @@ export default function CarForm() {
         <Box className="form-fields">
         
           <TextField 
-            id="brand"
-            name="brand" 
-            label="Marca" 
+            id="title"
+            name="title" 
+            label="Título" 
             variant="filled"
             required
             fullWidth
-            value={car.brand}
+            value={book.title}
             onChange={handleFieldChange}
             autoFocus
           />
 
           <TextField 
-            id="model"
-            name="model" 
-            label="Modelo" 
+            id="author"
+            name="author" 
+            label="Autor" 
             variant="filled"
             required
             fullWidth
-            placeholder="Ex.: Rua Principal"
-            value={car.model}
-            onChange={handleFieldChange}
-          />
-
-          <TextField 
-            id="color"
-            name="color" 
-            label="Cor" 
-            variant="filled"
-            required
-            fullWidth
-            value={car.color}
+            value={book.author}
             onChange={handleFieldChange}
           />
 
           <TextField
-            id="year_manufacture"
-            name="year_manufacture" 
-            label="Ano de fabricação"
+            id="year"
+            name="year" 
+            label="Ano de publicação"
             select
             defaultValue=""
             fullWidth
             variant="filled"
-            helperText="Selecione o ano"
-            value={car.year_manufacture}
+            value={book.year}
             onChange={handleFieldChange}
+            required
           >
             {years.map((option) => (
               <MenuItem key={option} value={option}>
@@ -310,79 +294,52 @@ export default function CarForm() {
             ))}
           </TextField>
 
-          <FormControlLabel 
-            className="MuiFormControl-root"
-            sx={{ justifyContent: "start" }}
-            onChange={handleFieldChange} 
-            control={<Switch defaultChecked />} 
-            label="Importado" 
-            id="imported" 
-            name="imported" 
-            labelPlacement="start" 
-            checked={car.imported}
-          />
-
-          <InputMask
-            formatChars={maskFormChars}
-            mask="AAA-9@99"
-            value={car.plates.toUpperCase() /* Placas em maiúsculas */ }
-            onChange={handleFieldChange}
-            maskChar=" "
-          >
-            {
-              () =>
-              <TextField 
-                id="plates"
-                name="plates" 
-                label="Placa" 
-                variant="filled"
-                required
-                fullWidth
-                inputProps={{style: {textTransform: 'uppercase'}}}
-              />
-            }
-          </InputMask>
-
-          <TextField 
-            id="selling_price"
-            name="selling_price" 
-            label="Preço de venda" 
-            variant="filled"
-            fullWidth
-            type="number"
-            InputProps={{ 
-              startAdornment: <InputAdornment position="start">R$</InputAdornment>
-            }}         
-            value={car.selling_price}
-            onChange={handleFieldChange}
-          />
-
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptLocale}>
-            <DatePicker
-              label="Data de venda"
-              value={car.selling_date}
-              onChange={ value => 
-                handleFieldChange({ target: { name: 'selling_date', value } }) 
-              }
-              slotProps={{ textField: { variant: 'filled', fullWidth: true } }}
-            />
-          </LocalizationProvider>
-
           <TextField
-            id="customer_id"
-            name="customer_id" 
-            label="Cliente adquirente"
+            id="belongs_to"
+            name="belongs_to" 
+            label="Instituição Proprietária"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={book.belongs_to}
+            onChange={handleFieldChange}
+          />
+
+          {/* <TextField
+            id="publisher_id"
+            name="publisher_id" 
+            label="Editora"
             select
             defaultValue=""
             fullWidth
             variant="filled"
-            helperText="Selecione o cliente"
-            value={car.customer_id}
+            helperText="Selecione a Editora"
+            value={book.customer_id}
             onChange={handleFieldChange}
           >
-            {customers.map(customer => (
-              <MenuItem key={customer.id} value={customer.id}>
-                {customer.name}
+            {publisher_id.map(publisher_id => (
+              <MenuItem key={publisher_id.id_publisher} value={publisher_id.id_publisher}>
+                {publisher_id.name_publisher}
+              </MenuItem>
+            ))}
+          </TextField> */}
+
+          <TextField
+            id="status"
+            name="status" 
+            label="Status do livro"
+            defaultValue=""
+            fullWidth
+            select
+            required
+            variant="filled"
+            value={book.status}
+            onChange={handleFieldChange}
+          >
+            {statusBook.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
               </MenuItem>
             ))}
           </TextField>
@@ -390,7 +347,7 @@ export default function CarForm() {
         </Box>
 
         <Box sx={{ fontFamily: 'monospace' }}>
-          { JSON.stringify(car) }
+          { JSON.stringify(book) }
         </Box>
 
         <Toolbar sx={{ justifyContent: "space-around" }}>

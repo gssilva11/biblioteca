@@ -2,7 +2,7 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
-import { format } from 'date-fns'
+// import { format } from 'date-fns'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton'
@@ -15,10 +15,10 @@ import myfetch from '../utils/myfetch'
 import Notification from '../components/ui/Notification'
 import Waiting from '../components/ui/Waiting'
 
-export default function CarsList() {
+export default function BooksList() {
 
   const [state, setState] = React.useState({
-    cars: {},
+    books: {},
     openDialog: false,
     deleteId: null,
     showWaiting: false,
@@ -31,7 +31,7 @@ export default function CarsList() {
 
   // Desestruturando as variáveis de estado
   const {
-    cars,
+    books,
     openDialog,
     deleteId,
     showWaiting,
@@ -48,7 +48,7 @@ export default function CarsList() {
     // Exibe a tela de espera
     setState({ ...state, showWaiting: true, openDialog: false })
     try {
-      const result = await myfetch.get('car?related=1')
+      const result = await myfetch.get('book?related=1')
 
       let notif = {
         show: false,
@@ -64,7 +64,7 @@ export default function CarsList() {
 
       setState({
         ...state, 
-        cars: result, 
+        books: result, 
         showWaiting: false,
         openDialog: false,
         notification: notif
@@ -87,77 +87,33 @@ export default function CarsList() {
   }
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'code', headerName: 'Código', width: 90 },
     {
-      field: 'brand',
-      headerName: 'Marca',
+      field: 'title',
+      headerName: 'Título',
       width: 150
     },
     {
-      field: 'model',
-      headerName: 'Modelo',
+      field: 'author',
+      headerName: 'Autor',
       align: 'left',
       headerAlign: 'left',
       width: 150
     },
     {
-      field: 'color',
-      headerName: 'Cor',
-      align: 'left',
-      headerAlign: 'left',
-      width: 150
-    },
-    {
-      field: 'year_manufacture',
-      headerName: 'Ano fabricação',
+      field: 'year',
+      headerName: 'Ano',
       width: 200
     },
     {
-      field: 'imported',
-      headerName: 'Ano fabricação',
-      width: 200,
-      valueFormatter: params => {
-        if(params.value === true)  return 'Sim'
-        return 'Não'
-      }
-    },
-    {
-      field: 'plates',
-      headerName: 'Placa',
+      field: 'belongs_to',
+      headerName: 'Proprietária',
       width: 200
     },
     {
-      field: 'selling_price',
-      headerName: 'Valor venda',
-      headerAlign: 'right',
-      align: 'right',
-      width: 200,
-      valueFormatter: params => {
-        if(params.value) return Number(params.value).toLocaleString(
-          'pt-BR',  // Português do Brasil
-          { style: 'currency', currency: 'BRL' }   // Moeda: real brasileiro
-        )
-        else return ''
-      }
-    },
-    {
-      field: 'selling_date',
-      headerName: 'Data venda',
-      align: 'left',
-      headerAlign: 'left',
-      width: 100,
-      valueFormatter: params => {
-        if(params.value) return format(new Date(params.value), 'dd/MM/yyyy')
-        else return ''
-      }
-    },
-    {
-      field: 'customer_id',
-      headerName: 'Cliente adquirente',
-      width: 250,
-      valueGetter: params => {
-        return params.row?.customer?.name
-      }
+      field: 'status',
+      headerName: 'Disponibilidade',
+      width: 200
     },
     {
       field: 'edit',
@@ -166,7 +122,7 @@ export default function CarsList() {
       align: 'left',
       width: 90,
       renderCell: params =>
-        <Link to={'./' + params.id}>
+        <Link to={'./' + params.code}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>
@@ -181,15 +137,15 @@ export default function CarsList() {
       renderCell: params =>
         <IconButton 
           aria-label="Excluir"
-          onClick={() => handleDeleteButtonClick(params.id)}
+          onClick={() => handleDeleteButtonClick(params.code)}
         >
           <DeleteForeverIcon color="error" />
         </IconButton>
     }
   ];
 
-  function handleDeleteButtonClick(id) {
-    setState({ ...state, deleteId: id, openDialog: true })
+  function handleDeleteButtonClick(code) {
+    setState({ ...state, deleteId: code, openDialog: true })
   }
 
   async function handleDialogClose(answer) {
@@ -199,7 +155,7 @@ export default function CarsList() {
     if(answer) {
       try {
         // Faz a chamada ao back-end para excluir o cliente
-        await myfetch.delete(`car/${deleteId}`)
+        await myfetch.delete(`book/${deleteId}`)
         
         // Se a exclusão tiver sido feita com sucesso, atualiza a listagem
         loadData(true)
@@ -249,7 +205,7 @@ export default function CarsList() {
       />
 
       <Typography variant="h1" sx={{ mb: '50px' }}>
-        Listagem de carros
+        Listagem de Livros
       </Typography>
 
       <Box sx={{
@@ -264,14 +220,14 @@ export default function CarsList() {
             size="large"
             startIcon={<AddBoxIcon />}
           >
-            Cadastrar novo carro
+            Cadastrar novo livro
           </Button>
         </Link>
       </Box>
 
       <Paper elevation={4} sx={{ height: 400, width: '100%' }}>
         <DataGrid
-          rows={cars}
+          rows={books}
           columns={columns}
           initialState={{
             pagination: {
