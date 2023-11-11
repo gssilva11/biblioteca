@@ -55,7 +55,7 @@ controller.retrieveAll = async function(req, res) {
 controller.retrieveOne = async function(req, res) {
   try {
     const result = await prisma.user.findUnique({
-      where: { cpf: Number(req.params.cpf) }
+      where: { id: Number(req.params.id) }
     })
 
     // Encontrou: retorna HTTP 200: OK
@@ -76,7 +76,7 @@ controller.update = async function(req, res) {
     User.parse(req.body)
 
     const result = await prisma.user.update({
-      where: { cpf: Number(req.params.cpf) },
+      where: { id: Number(req.params.id) },
       data: req.body
     })
 
@@ -100,7 +100,7 @@ controller.update = async function(req, res) {
 controller.delete = async function(req, res) {
   try {
     const result = await prisma.user.delete({
-      where: { cpf: Number(req.params.cpf) }
+      where: { id: Number(req.params.id) }
     })
     
     // HTTP 204: No Content

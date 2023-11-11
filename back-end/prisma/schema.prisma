@@ -11,14 +11,14 @@ datasource db {
 }
 
 model Book {
-  code          String         @id @default(uuid())
+  code          Int         @id @default(autoincrement())
   title         String
   author        String
   year          DateTime
   belongs_to    String
   publisher     Publisher      @relation(fields: [publisher_id], references: [id_publisher])
-  publisher_id  String   
-  status        BookStatus
+  publisher_id  Int   
+  status        BookStatus     @default(AVAILABLE)
 }
 
 enum BookStatus {
@@ -28,7 +28,7 @@ enum BookStatus {
 }
 
 model Publisher {
-  id_publisher     String      @id @default(uuid())
+  id_publisher     Int      @id @default(autoincrement())
   name_publisher   String
   city_publisher   String
   state_publisher  String
@@ -36,7 +36,8 @@ model Publisher {
 }
 
 model User {
-  cpf                   String      @id
+  id                    Int         @id @default(autoincrement())
+  cpf                   String      @unique
   email                 String      @unique
   name                  String
   code                  String      @unique

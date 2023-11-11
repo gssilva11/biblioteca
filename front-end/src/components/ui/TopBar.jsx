@@ -6,7 +6,6 @@ import logo from '../../assets/karangos-logo-600px.png'
 import MainMenu from './MainMenu'
 import myfetch from '../../utils/myfetch'
 import { useLocation, useNavigate } from 'react-router-dom'
-import UserMenu from './UserMenu'
 
 export default function TopBar() {
 
@@ -45,8 +44,6 @@ export default function TopBar() {
           <img src={logo} alt="Logotipo Karangos" style={{ width: '300px' }} />
         </Toolbar>
         
-        <UserMenu user={loggedInUser} />
-
       </AppBar>
     </Box>
   );

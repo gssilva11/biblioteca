@@ -11,16 +11,17 @@ import Box from '@mui/material/Box'
 import FooterBar from './components/ui/FooterBar'
 import CssBaseline from '@mui/material/CssBaseline'
 
-import Login from './pages/Login'
-import Logout from './components/ui/Logout'
-
 import Homepage from './pages/Homepage'
 
-import CustomersList from './pages/CustomersList'
-import CustomersForm from './pages/CustomersForm'
+import UsersList from './pages/UsersList'
+import UsersForm from './pages/UsersForm'
 
-import CarsForm from './pages/CarsForm'
-import CarsList from './pages/CarsList'
+import BooksForm from './pages/BooksForm'
+import BooksList from './pages/BooksList'
+
+import PublishersForm from './pages/PublishersForm'
+import PublishersList from './pages/PublishersList'
+
 
 function App() {
   return (
@@ -40,14 +41,15 @@ function App() {
 
               <Routes>
                 <Route path="/" element={ <Homepage /> } />
-                <Route path="/login" element={ <Login /> } />
-                <Route path="/logout" element={ <Logout /> } />
-                <Route path="/customers" element={ <CustomersList /> } />
-                <Route path="/customers/new" element={ <CustomersForm /> } />
-                <Route path="/customers/:id" element={ <CustomersForm /> } />
-                <Route path="/cars" element={ <CarsList /> } />
-                <Route path="/cars/new" element={ <CarsForm /> } />
-                <Route path="/cars/:id" element={ <CarsForm /> } />
+                <Route path="/user" element={ <UsersList /> } />
+                <Route path="/user/new" element={ <UsersForm /> } />
+                <Route path="/user/:id" element={ <UsersForm /> } />
+                <Route path="/book" element={ <BooksList /> } />
+                <Route path="/book/new" element={ <BooksForm /> } />
+                <Route path="/book/:id" element={ <BooksForm /> } />
+                <Route path="/publisher" element={ <PublishersList /> } />
+                <Route path="/publisher/new" element={ <PublishersForm /> } />
+                <Route path="/publisher/:id" element={ <PublishersForm /> } />
               </Routes>
 
             </Box>
