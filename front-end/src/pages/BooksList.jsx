@@ -18,7 +18,7 @@ import Waiting from '../components/ui/Waiting'
 export default function BooksList() {
 
   const [state, setState] = React.useState({
-    books: {},
+    books: [],
     openDialog: false,
     deleteId: null,
     showWaiting: false,
@@ -229,6 +229,7 @@ export default function BooksList() {
         <DataGrid
           rows={books}
           columns={columns}
+          getRowId={(row) => row.code}
           initialState={{
             pagination: {
               paginationModel: {

@@ -23,10 +23,6 @@ const Book = z.object({
     z.string()
     .min(1, { message: 'O da instituição deve conter no mínimo 1 caractere.' })
     .max(100, { message: 'O nome da instituição pode conter até 100 caracteres.' }),
-  
-  publisher_id:
-    z.number()
-    .max(2, { message:'O ID deve conter no máximo 2 dígitos.' })
     
 })
 

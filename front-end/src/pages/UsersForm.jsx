@@ -10,35 +10,32 @@ import Waiting from '../components/ui/Waiting'
 import Notification from '../components/ui/Notification'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
-import InputMask from 'react-input-mask'
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import ptLocale from 'date-fns/locale/pt-BR'
-import { parseISO } from 'date-fns'
-import Customer from '../models/customer'
+// import InputMask from 'react-input-mask'
+// import InputAdornment from '@mui/material/InputAdornment'
+
+// import userModel from '../models/user'
 import { ZodError } from 'zod'
 
-export default function CustomersForm() {
+
+export default function UserForm() {
 
   const navigate = useNavigate()
   const params = useParams()
 
-  // Valores padrão para os campos do formulário
-  const customerDefaults = {
+  const userDefaults = {
+    email: '',
     name: '',
-    ident_document: '',
-    //birth_date: '',
-    street_name: '',
-    house_number: '',
-    neighborhood: '',
-    municipality: '',
-    state: '',
+    code: '',
     phone: '',
-    email: ''
+    city: '',
+    state: '',
+    institution: '',
+    role: ''
   }
 
   const [state, setState] = React.useState({
-    customer: customerDefaults,    
+    user: userDefaults, 
+    pubhisher_id: [],   
     showWaiting: false,
     notification: {
       show: false,
@@ -46,35 +43,26 @@ export default function CustomersForm() {
       message: ''
     },
     openDialog: false,
-    isFormModified: false,
-    validationErrors: {}
+    isFormModified: false
   })
 
   const {
-    customer,
+    user,
     showWaiting,
     notification,
     openDialog,
-    isFormModified,
-    validationErrors
+    isFormModified
   } = state
-
-  const states = [
-    { label: 'Distrito Federal', value: 'DF' },
-    { label: 'Espírito Santo', value: 'ES' },
-    { label: 'Goiás', value: 'GO' },
-    { label: 'Minas Gerais', value: 'MG' },
-    { label: 'Paraná', value: 'PR' },
-    { label: 'Rio de Janeiro', value: 'RJ' },
-    { label: 'São Paulo', value: 'SP' }
-  ]
-
-  const maskFormatChars = {
-    '9': '[0-9]',
-    'a': '[A-Za-z]',
-    '*': '[A-Za-z0-9]',
-    '_': '[\s0-9]'     // Um espaço em branco ou um dígito
-  }
+  
+  // const maskFormChars = {
+  //   '9': '[0-9]',
+  //   'A': '[A-Za-z]',
+  //   '*': '[A-Za-z0-9]',
+  //   '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
+  //   '_': '[\s0-9]'
+  // }
+  
+  const roleUser = ['STUDENT', 'EMPLOYEE', 'ADMIN']
 
   // useEffect com vetor de dependências vazio. Será executado
   // uma vez, quando o componente for carregado
@@ -82,22 +70,25 @@ export default function CustomersForm() {
     // Verifica se existe o parâmetro id na rota.
     // Caso exista, chama a função fetchData() para carregar
     // os dados indicados pelo parâmetro para edição
-    if(params.id) fetchData()
+    fetchData(params.id)
   }, [])
 
-  async function fetchData() {
+  async function fetchData(isUpdating) {
     // Exibe o backdrop para indicar que uma operação está ocorrendo
     // em segundo plano
     setState({ ...state, showWaiting: true })
     try {
-      const result = await myfetch.get(`customer/${params.id}`)
-      
-      // É necesário converter a data de nascimento de string para data
-      // antes de carregá-la no componente DatePicker
-      result.birth_date = parseISO(result.birth_date)
 
-      setState({ ...state, showWaiting: false, customer: result })
-      
+      let user = userDefaults
+
+      // Se estivermos no modo de atualização, devemos carregar o
+      // registro indicado no parâmetro da rota 
+      if(isUpdating) {
+        user = await myfetch.get(`user/${params.id}`)
+      }
+
+      setState({ ...state, showWaiting: false, user})
+
     } 
     catch(error) {
       setState({ ...state, 
@@ -112,13 +103,12 @@ export default function CustomersForm() {
   }
 
   function handleFieldChange(event) {
-    console.log(event)
-    const newCustomer = { ...customer }
-    newCustomer[event.target.name] = event.target.value
-    
+    const newUser = { ...user }
+    newUser[event.target.name] = event.target.value
+
     setState({ 
       ...state, 
-      customer: newCustomer,
+      user: newUser,
       isFormModified: true      // O formulário foi alterado
     })
   }
@@ -126,34 +116,29 @@ export default function CustomersForm() {
   async function handleFormSubmit(event) {
     setState({ ...state, showWaiting: true }) // Exibe o backdrop
     event.preventDefault(false)   // Evita o recarregamento da página
+  
     try {
 
-      console.log({customer})
+      console.log({user})
 
       // Chama a validação da biblioteca Zod
-      Customer.parse(customer)
+      // user.parse(user)
 
-      let result
-
-      // Se existir o campo id no json de dados, chama o método PUT
-      // para alteração
-      if(customer.id) result = await myfetch.put(`customer/${customer.id}`, customer)
-
-      // Senão, chama o método POST para criar um novo registro
-      else result = await myfetch.post('customer', customer)
-      
+      let result 
+      // se id então put para atualizar
+      if(user.id) result = await myfetch.put(`user/${user.id}`, user)
+      //senão post para criar novo 
+      else result = await myfetch.post('user', user)
       setState({ ...state, 
         showWaiting: false, // Esconde o backdrop
         notification: {
           show: true,
           severity: 'success',
-          message: 'Dados salvos com sucesso.',
-          validationErrors: {}
+          message: 'Dados salvos com sucesso.'
         }  
       })  
     }
     catch(error) {
-
       if(error instanceof ZodError) {
         console.error(error)
 
@@ -215,7 +200,7 @@ export default function CustomersForm() {
     // Fechamos a caixa de diálogo
     setState({ ...state, openDialog: false })
 
-    // Se o usuário tiver respondido se quer voltar à página
+    // Se o usuário tiver respondido quer quer voltar à página
     // de listagem mesmo com alterações pendentes, faremos a
     // vontade dele
     if(answer) navigate('..', { relative: 'path' })
@@ -242,7 +227,7 @@ export default function CustomersForm() {
       /> 
 
       <Typography variant="h1" sx={{ mb: '50px' }}>
-        Cadastro de clientes
+        Cadastro de Alunos
       </Typography>
 
       <form onSubmit={handleFormSubmit}>
@@ -250,163 +235,16 @@ export default function CustomersForm() {
         <Box className="form-fields">
         
           <TextField 
-            id="name"
-            name="name" 
-            label="Nome completo" 
+            id="cpf"
+            name="cpf" 
+            label="CPF" 
             variant="filled"
             required
             fullWidth
-            value={customer.name}
+            value={user.cpf}
             onChange={handleFieldChange}
             autoFocus
-            error={validationErrors?.name}
-            helperText={validationErrors?.name}
           />
-
-          <InputMask
-            mask="999.999.999-99"
-            maskChar=" "
-            value={customer.ident_document}
-            onChange={handleFieldChange}
-          >
-            {
-              () => <TextField 
-                id="ident_document"
-                name="ident_document" 
-                label="CPF" 
-                variant="filled"
-                required
-                fullWidth
-                error={validationErrors?.ident_document}
-                helperText={validationErrors?.ident_document}
-              />
-            }
-          </InputMask>
-
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptLocale}>
-            <DatePicker
-              label="Data de nascimento"
-              value={customer.birth_date}
-              onChange={ value => 
-                handleFieldChange({ target: { name: 'birth_date', value } }) 
-              }
-              slotProps={{ textField: { 
-                variant: 'filled', 
-                fullWidth: true,
-                error: validationErrors?.birth_date,
-                helperText: validationErrors?.birth_date
-              }}}
-            />
-          </LocalizationProvider>
-
-          <TextField 
-            id="street_name"
-            name="street_name" 
-            label="Logradouro (Rua, Av., etc.)" 
-            variant="filled"
-            required
-            fullWidth
-            placeholder="Ex.: Rua Principal"
-            value={customer.street_name}
-            onChange={handleFieldChange}
-            error={validationErrors?.street_name}
-            helperText={validationErrors?.street_name}
-          />
-
-          <TextField 
-            id="house_number"
-            name="house_number" 
-            label="Nº" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.house_number}
-            onChange={handleFieldChange}
-            error={validationErrors?.house_number}
-            helperText={validationErrors?.house_number}
-          />
-
-          <TextField 
-            id="complements"
-            name="complements" 
-            label="Complemento" 
-            variant="filled"
-            fullWidth
-            placeholder="Apto., bloco, casa, etc."
-            value={customer.complements}
-            onChange={handleFieldChange}
-            error={validationErrors?.complements}
-            helperText={validationErrors?.complements}
-          />
-
-          <TextField 
-            id="neighborhood"
-            name="neighborhood" 
-            label="Bairro" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.neighborhood}
-            onChange={handleFieldChange}
-            error={validationErrors?.neighborhood}
-            helperText={validationErrors?.neighborhood}
-          />
-          
-          <TextField 
-            id="municipality"
-            name="municipality" 
-            label="Município" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.municipality}
-            onChange={handleFieldChange}
-            error={validationErrors?.municipality}
-            helperText={validationErrors?.municipality}
-          />
-
-          <TextField
-            id="state"
-            name="state"
-            select
-            label="UF"
-            variant="filled"
-            fullWidth
-            required
-            value={customer.state}
-            onChange={handleFieldChange}
-            error={validationErrors?.state}
-            helperText={validationErrors?.state}
-          >
-            {states.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <InputMask
-            mask="(99) _9999-9999"
-            formatChars={maskFormatChars}
-            maskChar="_"
-            value={customer.phone}
-            onChange={handleFieldChange}
-          >
-            {
-              () => <TextField 
-                id="phone"
-                name="phone" 
-                label="Celular / Telefone de contato" 
-                variant="filled"
-                required
-                fullWidth
-                value={customer.phone}
-                onChange={handleFieldChange}
-                error={validationErrors?.phone}
-                helperText={validationErrors?.phone}
-              />
-            }
-          </InputMask>
 
           <TextField 
             id="email"
@@ -415,16 +253,106 @@ export default function CustomersForm() {
             variant="filled"
             required
             fullWidth
-            value={customer.email}
+            value={user.email}
             onChange={handleFieldChange}
-            error={validationErrors?.email}
-            helperText={validationErrors?.email}
           />
+
+          <TextField
+            id="name"
+            name="name" 
+            label="Nome"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.name}
+            onChange={handleFieldChange}
+          />
+
+          <TextField
+            id="code"
+            name="code" 
+            label="Code"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.code}
+            onChange={handleFieldChange}
+          />
+
+<         TextField
+            id="phone"
+            name="phone" 
+            label="Telefone"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.phone}
+            onChange={handleFieldChange}
+          />
+
+          <TextField
+            id="city"
+            name="city" 
+            label="Cidade"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.city}
+            onChange={handleFieldChange}
+          />
+
+          <TextField
+            id="state"
+            name="state" 
+            label="Estado"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.state}
+            onChange={handleFieldChange}
+          />
+
+          <TextField
+            id="institution"
+            name="institution" 
+            label="Instituição"
+            defaultValue=""
+            fullWidth
+            required
+            variant="filled"
+            value={user.institution}
+            onChange={handleFieldChange}
+          />
+
+          <TextField
+            id="role"
+            name="role" 
+            label="Função"
+            defaultValue=""
+            fullWidth
+            select
+            required
+            variant="filled"
+            value={user.role}
+            onChange={handleFieldChange}
+          >
+            {roleUser.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+
           
         </Box>
 
         <Box sx={{ fontFamily: 'monospace' }}>
-          { JSON.stringify(customer) }
+          { JSON.stringify(user) }
         </Box>
 
         <Toolbar sx={{ justifyContent: "space-around" }}>

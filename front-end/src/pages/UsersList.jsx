@@ -2,7 +2,6 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
-import { format } from 'date-fns'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton'
@@ -15,10 +14,10 @@ import myfetch from '../utils/myfetch'
 import Notification from '../components/ui/Notification'
 import Waiting from '../components/ui/Waiting'
 
-export default function CustomersList() {
+export default function UsersList() {
 
   const [state, setState] = React.useState({
-    customers: {},
+    users: [],
     openDialog: false,
     deleteId: null,
     showWaiting: false,
@@ -31,7 +30,7 @@ export default function CustomersList() {
 
   // Desestruturando as variáveis de estado
   const {
-    customers,
+    users,
     openDialog,
     deleteId,
     showWaiting,
@@ -48,7 +47,7 @@ export default function CustomersList() {
     // Exibe a tela de espera
     setState({ ...state, showWaiting: true, openDialog: false })
     try {
-      const result = await myfetch.get('customer')
+      const result = await myfetch.get('user?related=1')
 
       let notif = {
         show: false,
@@ -64,7 +63,7 @@ export default function CustomersList() {
 
       setState({
         ...state, 
-        customers: result, 
+        users: result, 
         showWaiting: false,
         openDialog: false,
         notification: notif
@@ -89,41 +88,9 @@ export default function CustomersList() {
   const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
-      field: 'name',
-      headerName: 'Nome',
-      width: 300
-    },
-    {
-      field: 'ident_document',
+      field: 'cpf',
       headerName: 'CPF',
-      align: 'center',
-      headerAlign: 'center',
-      width: 150
-    },
-    {
-      field: 'birth_date',
-      headerName: 'Data nasc.',
-      align: 'center',
-      headerAlign: 'center',
-      width: 100,
-      valueFormatter: params => {
-        if(params.value) return format(new Date(params.value), 'dd/MM/yyyy')
-        else return ''
-      }
-    },
-    {
-      field: 'municipality',
-      headerName: 'Município/UF',
-      width: 300,
-      // Colocando dois campos na mesma célula
-      valueGetter: params => params.row.municipality + '/' + params.row.state
-    },
-    {
-      field: 'phone',
-      headerName: 'Celular',
-      align: 'center',
-      headerAlign: 'center',
-      width: 150
+      width: 200
     },
     {
       field: 'email',
@@ -131,13 +98,49 @@ export default function CustomersList() {
       width: 200
     },
     {
+      field: 'name',
+      headerName: 'Nome',
+      width: 200
+    },
+    {
+      field: 'code',
+      headerName: 'Código',
+      width: 200
+    },
+    {
+      field: 'phone',
+      headerName: 'Telefone',
+      width: 200
+    },
+    {
+      field: 'city',
+      headerName: 'Cidade',
+      width: 200
+    },
+    {
+      field: 'state',
+      headerName: 'Estado',
+      width: 200
+    },
+    {
+      field: 'institution',
+      headerName: 'Instituição',
+      width: 200
+    },
+    {
+      field: 'role',
+      headerName: 'Função',
+      width: 200
+    },
+
+    {
       field: 'edit',
       headerName: 'Editar',
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: 'left',
+      align: 'left',
       width: 90,
       renderCell: params =>
-        <Link to={'./' + params.id}>
+        <Link to={'./' + params.code}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>
@@ -146,30 +149,31 @@ export default function CustomersList() {
     {
       field: 'delete',
       headerName: 'Excluir',
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: 'left',
+      align: 'left',
       width: 90,
       renderCell: params =>
         <IconButton 
           aria-label="Excluir"
-          onClick={() => handleDeleteButtonClick(params.id)}
+          onClick={() => handleDeleteButtonClick(params.code)}
         >
           <DeleteForeverIcon color="error" />
         </IconButton>
     }
   ];
 
-  function handleDeleteButtonClick(id) {
-    setState({ ...state, deleteId: id, openDialog: true })
+  function handleDeleteButtonClick(code) {
+    setState({ ...state, deleteId: code, openDialog: true })
   }
 
   async function handleDialogClose(answer) {
+    // Fecha a caixa de diálogo de confirmação
+    setState({ ...state, openDialog: false })
+
     if(answer) {
-      // Fecha a caixa de diálogo de confirmação e exibe a tela de espera
-      setState({ ...state, openDialog: false, showWaiting: true })
       try {
         // Faz a chamada ao back-end para excluir o cliente
-        await myfetch.delete(`customer/${deleteId}`)
+        await myfetch.delete(`user/${deleteId}`)
         
         // Se a exclusão tiver sido feita com sucesso, atualiza a listagem
         loadData(true)
@@ -188,8 +192,6 @@ export default function CustomersList() {
         console.error(error)
       }
     }
-    // Fecha a caixa de diálogo de confirmação
-    else setState({ ...state, openDialog: false })
   }
 
   function handleNotificationClose() {
@@ -221,7 +223,7 @@ export default function CustomersList() {
       />
 
       <Typography variant="h1" sx={{ mb: '50px' }}>
-        Listagem de clientes
+        Listagem de Livros
       </Typography>
 
       <Box sx={{
@@ -236,15 +238,16 @@ export default function CustomersList() {
             size="large"
             startIcon={<AddBoxIcon />}
           >
-            Cadastrar novo cliente
+            Cadastrar novo livro
           </Button>
         </Link>
       </Box>
 
       <Paper elevation={4} sx={{ height: 400, width: '100%' }}>
         <DataGrid
-          rows={customers}
+          rows={users}
           columns={columns}
+          getRowId={(row) => row.code}
           initialState={{
             pagination: {
               paginationModel: {
