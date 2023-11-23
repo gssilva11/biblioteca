@@ -29,3 +29,7 @@
   width: 600px;
   margin-bottom: 20px;
 }
+
+#removerSublinhadoLink {
+  text-decoration: none;
+}

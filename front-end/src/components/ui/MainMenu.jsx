@@ -25,7 +25,7 @@ export default function MainMenu() {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
         edge="start" 
-        color="inherit" 
+        color='secondary'
         aria-label="menu" 
         sx={{ mr: 2 }}
       >

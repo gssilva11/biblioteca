@@ -1,8 +1,7 @@
 import React from 'react'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper';
-import { DataGrid } from '@mui/x-data-grid';
-// import { format } from 'date-fns'
+// import Paper from '@mui/material/Paper';
+// import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton'
@@ -14,6 +13,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog'
 import myfetch from '../utils/myfetch'
 import Notification from '../components/ui/Notification'
 import Waiting from '../components/ui/Waiting'
+import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper } from '@mui/material';
 
 export default function BooksList() {
 
@@ -186,7 +186,6 @@ export default function BooksList() {
   
   return (
     <>
-
       <ConfirmDialog
         title="Confirmar operação"
         open={openDialog}
@@ -194,57 +193,73 @@ export default function BooksList() {
       >
         Deseja realmente excluir este item?
       </ConfirmDialog>
-
+  
       <Waiting show={showWaiting} />
-
+  
       <Notification
         show={notification.show}
         severity={notification.severity}
         message={notification.message}
         onClose={handleNotificationClose}
       />
-
-      <Typography variant="h1" sx={{ 
-        mb: '50px' , 
-        fontFamily:'ITC Benguiat',
-        color:'#ffb48a'}}>
-        Listagem de Livros
-      </Typography>
-
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'right',
-        mb: '25px'  // margin-bottom
-      }}>
+  
+  <Box sx={{ textAlign: 'left', ml: '20px', mt: '30px' }}>
+        <Typography variant="h1" sx={{
+          fontFamily: 'ITC Benguiat',
+          color: '#ffb48a',
+          fontSize: '2.5rem',
+          mb:'20px'
+        }}>
+          Listagem de Livros
+        </Typography>
+      </Box>
+  
+      <Box sx={{ position: 'absolute', top: 50, right: 5, margin: '15px' }}>
         <Link to="new">
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             color="secondary"
-            size="large"
             startIcon={<AddBoxIcon />}
+            sx={{
+              textTransform: 'none',
+              backgroundColor: '#ffb48a',
+              '&:hover': {
+                backgroundColor: '#e07d49',
+              },
+            }}
           >
-            Cadastrar novo livro
+            Novo
           </Button>
         </Link>
       </Box>
-
-      <Paper elevation={4} sx={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={books}
-          columns={columns}
-          getRowId={(row) => row.code}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
-            },
-          }}
-          pageSizeOptions={[5]}
-          checkboxSelection
-          disableRowSelectionOnClick
-        />
+  
+      <Paper elevation={4} sx={{ width: '100%', overflow: 'auto', backgroundColor: '#320000'}}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell key={column.field} sx={{ borderBottom: '1px solid #e0e0e0', color: '#fff' }}>
+                    {column.headerName}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {books.map((row) => (
+                <TableRow key={row.code}>
+                  {columns.map((column) => (
+                    <TableCell key={column.field} sx={{ borderBottom: '1px solid #e0e0e0', padding: '16px', color: '#fff' }}>
+                      {column.renderCell ? column.renderCell(row) : row[column.field]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
     </>
-  )
+  );
+  
 }

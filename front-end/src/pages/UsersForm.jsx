@@ -10,8 +10,8 @@ import Waiting from '../components/ui/Waiting'
 import Notification from '../components/ui/Notification'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
-// import InputMask from 'react-input-mask'
-// import InputAdornment from '@mui/material/InputAdornment'
+import InputMask from 'react-input-mask'
+import InputAdornment from '@mui/material/InputAdornment'
 
 // import userModel from '../models/user'
 import { ZodError } from 'zod'
@@ -54,13 +54,13 @@ export default function UserForm() {
     isFormModified
   } = state
   
-  // const maskFormChars = {
-  //   '9': '[0-9]',
-  //   'A': '[A-Za-z]',
-  //   '*': '[A-Za-z0-9]',
-  //   '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
-  //   '_': '[\s0-9]'
-  // }
+  const maskFormChars = {
+    '9': '[0-9]',
+    'A': '[A-Za-z]',
+    '*': '[A-Za-z0-9]',
+    '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
+    '_': '[\s0-9]'
+  }
   
   const roleUser = ['STUDENT', 'EMPLOYEE', 'ADMIN']
 
@@ -206,6 +206,8 @@ export default function UserForm() {
     if(answer) navigate('..', { relative: 'path' })
   }
 
+  const statePublisher= ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
+
   return(
     <>
 
@@ -239,17 +241,23 @@ export default function UserForm() {
 
         <Box className="form-fields">
         
-          <TextField 
-            id="cpf"
-            name="cpf" 
-            label="CPF" 
-            variant="filled"
-            required
-            fullWidth
+        <InputMask
+            mask="999.999.999-99"
+            maskChar=" "
             value={user.cpf}
             onChange={handleFieldChange}
-            autoFocus
-          />
+          >
+            {
+              () => <TextField 
+                id="cpf"
+                name="cpf" 
+                label="CPF" 
+                variant="filled"
+                required
+                fullWidth
+              />
+            }
+          </InputMask>
 
           <TextField 
             id="email"
@@ -286,17 +294,26 @@ export default function UserForm() {
             onChange={handleFieldChange}
           />
 
-<         TextField
-            id="phone"
-            name="phone" 
-            label="Telefone"
-            defaultValue=""
-            fullWidth
-            required
-            variant="filled"
+          <InputMask
+            mask="(99) _9999-9999"
+            formatChars={maskFormChars}
+            maskChar="_"
             value={user.phone}
             onChange={handleFieldChange}
-          />
+          >
+            {
+              () => <TextField 
+                id="phone"
+                name="phone" 
+                label="Celular / Telefone de contato" 
+                variant="filled"
+                required
+                fullWidth
+                value={user.phone}
+                onChange={handleFieldChange}
+              />
+            }
+          </InputMask>
 
           <TextField
             id="city"
@@ -316,11 +333,18 @@ export default function UserForm() {
             label="Estado"
             defaultValue=""
             fullWidth
+            select
             required
             variant="filled"
             value={user.state}
             onChange={handleFieldChange}
-          />
+          >
+            {statePublisher.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
 
           <TextField
             id="institution"
