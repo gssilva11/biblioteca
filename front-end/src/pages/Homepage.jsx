@@ -1,26 +1,78 @@
 import React from 'react'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import image from '../assets/vintage-cars.png'
-
+import imageBook from '../assets/livro.png'
+import imageUser from '../assets/usuario.png'
+import imagePublisher from '../assets/editora.png'
+import { Link } from 'react-router-dom'
 export default function Homepage() {
 
   return (
     <>
       <Typography variant="h1" sx={{
-        mb: '50px'    // marginBottom
+        display: 'flex',
+        justifyContent:'center',
+        mt:'40px',
+        mb:'100px',
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'
+        
       }}>
-        Bem-vindo(a) à loja Karangos!
+        SEJA BEM VINDO(A) À BIBLIOTECA!
       </Typography>
+      
+      <Box
+        sx={{
+          display:'flex',
+          justifyContent:'space-around'
+        }}
+      >
+        <Box sx={{
+          textAlign: 'center',
+          '& img': {
+            maxWidth: '300px',
+            width: '80%',
+            borderRadius:'10px'
+          }
+        }}>
+          <Link to='/user/new'>
+            <img 
+              src={imageUser} alt="Cadastrar Usuários" 
+              style={{ cursor: 'pointer' }}
+            />
+          </Link>
+        </Box>
+        <Box sx={{
+          textAlign: 'center',
+          '& img': {
+            maxWidth: '300px',
+            width: '80%',
+            borderRadius:'10px'
 
-      <Box sx={{
-        textAlign: 'center',
-        '& img': {
-          maxWidth: '800px',
-          width: '80%'
-        }
-      }}>
-        <img src={image} alt="Carros antigos" />
+          }
+        }}>
+          <Link to='/book/new'>
+            <img 
+              src={imageBook} alt="Cadastrar Usuários" 
+              style={{ cursor: 'pointer' }}
+            />
+          </Link>
+        </Box>
+        <Box sx={{
+          textAlign: 'center',
+          '& img': {
+            maxWidth: '300px',
+            width: '80%',
+            borderRadius:'10px'
+          }
+        }}>
+          <Link to='/publisher/new'>
+            <img 
+              src={imagePublisher} alt="Cadastrar Usuários" 
+              style={{ cursor: 'pointer' }}
+            />
+          </Link>
+        </Box>
       </Box>
     </>
   )

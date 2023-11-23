@@ -226,8 +226,13 @@ export default function UserForm() {
         onClose={handleNotificationClose}
       /> 
 
-      <Typography variant="h1" sx={{ mb: '50px' }}>
-        Cadastro de Alunos
+      <Typography variant="h1" sx={{ 
+        mb: '50px' , 
+        display:'flex', 
+        justifyContent:'center', 
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'}}>
+        Cadastro de Usuários
       </Typography>
 
       <form onSubmit={handleFormSubmit}>
@@ -348,29 +353,30 @@ export default function UserForm() {
             ))}
           </TextField>
 
-          
+          <Toolbar sx={{ justifyContent:'space-around', display:'flex' }}>
+            <Button 
+              variant="contained" 
+              color="secondary" 
+              type="submit"
+            >
+              Salvar
+            </Button>
+            
+            <Button 
+              color="secondary"
+              variant="outlined"
+              onClick={handleBackButtonClose}
+            >
+              Voltar
+            </Button>
+          </Toolbar>
         </Box>
 
-        <Box sx={{ fontFamily: 'monospace' }}>
+        {/* <Box sx={{ fontFamily: 'monospace' }}>
           { JSON.stringify(user) }
-        </Box>
+        </Box> */}
 
-        <Toolbar sx={{ justifyContent: "space-around" }}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            type="submit"
-          >
-            Salvar
-          </Button>
-          
-          <Button 
-            variant="outlined"
-            onClick={handleBackButtonClose}
-          >
-            Voltar
-          </Button>
-        </Toolbar>
+
       
       </form>
     </>

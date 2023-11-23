@@ -204,7 +204,10 @@ export default function BooksList() {
         onClose={handleNotificationClose}
       />
 
-      <Typography variant="h1" sx={{ mb: '50px' }}>
+      <Typography variant="h1" sx={{ 
+        mb: '50px' , 
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'}}>
         Listagem de Livros
       </Typography>
 

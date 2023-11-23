@@ -244,7 +244,12 @@ export default function BookForm() {
         onClose={handleNotificationClose}
       /> 
 
-      <Typography variant="h1" sx={{ mb: '50px' }}>
+      <Typography variant="h1" sx={{ 
+        mb: '50px' , 
+        display:'flex', 
+        justifyContent:'center', 
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'}}>
         Cadastro de Livros
       </Typography>
 
@@ -324,7 +329,7 @@ export default function BookForm() {
               </MenuItem>
             ))}
           </TextField> */}
-
+        
           <TextField
             id="status"
             name="status" 
@@ -344,13 +349,7 @@ export default function BookForm() {
             ))}
           </TextField>
           
-        </Box>
-
-        <Box sx={{ fontFamily: 'monospace' }}>
-          { JSON.stringify(book) }
-        </Box>
-
-        <Toolbar sx={{ justifyContent: "space-around" }}>
+          <Toolbar sx={{ justifyContent:'space-around', display:'flex' }}>
           <Button 
             variant="contained" 
             color="secondary" 
@@ -360,12 +359,21 @@ export default function BookForm() {
           </Button>
           
           <Button 
+            color="secondary"
             variant="outlined"
             onClick={handleBackButtonClose}
           >
             Voltar
           </Button>
         </Toolbar>
+
+        </Box>
+
+        {/* <Box sx={{ fontFamily: 'monospace' }}>
+          { JSON.stringify(book) }
+        </Box> */}
+
+
       
       </form>
     </>

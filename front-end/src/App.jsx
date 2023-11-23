@@ -19,8 +19,8 @@ import UsersForm from './pages/UsersForm'
 import BooksForm from './pages/BooksForm'
 import BooksList from './pages/BooksList'
 
-// import PublishersForm from './pages/PublishersForm'
-// import PublishersList from './pages/PublishersList'
+import PublishersForm from './pages/PublishersForm'
+import PublishersList from './pages/PublishersList'
 
 
 function App() {
@@ -47,9 +47,10 @@ function App() {
                 <Route path="/book" element={ <BooksList /> } />
                 <Route path="/book/new" element={ <BooksForm /> } />
                 <Route path="/book/:id" element={ <BooksForm /> } />
-                {/* <Route path="/publisher" element={ <PublishersList /> } />
+                <Route path="/publisher" element={ <PublishersList /> } />
                 <Route path="/publisher/new" element={ <PublishersForm /> } />
-                <Route path="/publisher/:id" element={ <PublishersForm /> } /> */}
+                <Route path="/publisher/:id" element={ <PublishersForm /> } />
+
               </Routes>
 
             </Box>

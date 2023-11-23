@@ -222,8 +222,11 @@ export default function UsersList() {
         onClose={handleNotificationClose}
       />
 
-      <Typography variant="h1" sx={{ mb: '50px' }}>
-        Listagem de Livros
+      <Typography variant="h1" sx={{ 
+        mb: '50px' , 
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'}}>
+        Listagem de Usuários
       </Typography>
 
       <Box sx={{
@@ -238,7 +241,7 @@ export default function UsersList() {
             size="large"
             startIcon={<AddBoxIcon />}
           >
-            Cadastrar novo livro
+            Cadastrar novo Usuário
           </Button>
         </Link>
       </Box>

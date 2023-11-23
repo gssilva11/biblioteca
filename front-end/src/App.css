@@ -16,15 +16,16 @@
 
 .form-fields {
   margin: 0 auto;
-  width: 95%;
-  display: flex;
-  justify-content: space-between;
+  width: 60%;
+  display:grid;
   flex-wrap: wrap;
+  justify-content:space-around;
 }
 
 .form-fields .MuiFormControl-root {
-  min-width: 250px;
-  max-width: 600px;
+  padding: '10px';
+  min-width: 200px;
+  max-width: 350px;
   width: 600px;
-  margin-bottom: 36px;
+  margin-bottom: 20px;
 }

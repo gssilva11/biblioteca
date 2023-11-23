@@ -10,35 +10,31 @@ import Waiting from '../components/ui/Waiting'
 import Notification from '../components/ui/Notification'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
-import InputMask from 'react-input-mask'
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import ptLocale from 'date-fns/locale/pt-BR'
-import { parseISO } from 'date-fns'
-import Customer from '../models/customer'
+// import InputMask from 'react-input-mask'
+// import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers'
+// import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
+// import ptLocale from 'date-fns/locale/pt-BR'
+// import { parseISO } from 'date-fns'
+// import { FormControlLabel, Switch } from '@mui/material'
+// import InputAdornment from '@mui/material/InputAdornment'
+
+// import publisherModel from '../models/publisher'
 import { ZodError } from 'zod'
 
-export default function CustomersForm() {
+
+export default function PublisherForm() {
 
   const navigate = useNavigate()
   const params = useParams()
 
-  // Valores padrão para os campos do formulário
-  const customerDefaults = {
-    name: '',
-    ident_document: '',
-    //birth_date: '',
-    street_name: '',
-    house_number: '',
-    neighborhood: '',
-    municipality: '',
-    state: '',
-    phone: '',
-    email: ''
+  const publisherDefaults = {
+    name_publisher: '',
+    city_publisher: ''
   }
 
   const [state, setState] = React.useState({
-    customer: customerDefaults,    
+    publisher: publisherDefaults, 
+    pubhisher_id: [],   
     showWaiting: false,
     notification: {
       show: false,
@@ -46,58 +42,61 @@ export default function CustomersForm() {
       message: ''
     },
     openDialog: false,
-    isFormModified: false,
-    validationErrors: {}
+    isFormModified: false
   })
 
   const {
-    customer,
+    publisher,
+    // publisher_id,
     showWaiting,
     notification,
     openDialog,
-    isFormModified,
-    validationErrors
+    isFormModified
   } = state
-
-  const states = [
-    { label: 'Distrito Federal', value: 'DF' },
-    { label: 'Espírito Santo', value: 'ES' },
-    { label: 'Goiás', value: 'GO' },
-    { label: 'Minas Gerais', value: 'MG' },
-    { label: 'Paraná', value: 'PR' },
-    { label: 'Rio de Janeiro', value: 'RJ' },
-    { label: 'São Paulo', value: 'SP' }
-  ]
-
-  const maskFormatChars = {
-    '9': '[0-9]',
-    'a': '[A-Za-z]',
-    '*': '[A-Za-z0-9]',
-    '_': '[\s0-9]'     // Um espaço em branco ou um dígito
-  }
+  
+  // const maskFormChars = {
+  //   '9': '[0-9]',
+  //   'A': '[A-Za-z]',
+  //   '*': '[A-Za-z0-9]',
+  //   '@': '[A-Ja-j0-9]', // Aceita letras de A a J (maiúsculas ou minúsculas) e dígitos
+  //   '_': '[\s0-9]'
+  // }
 
   // useEffect com vetor de dependências vazio. Será executado
   // uma vez, quando o componente for carregado
   React.useEffect(() => {
-    // Verifica se existe o parâmetro id na rota.
+    // Verifica se existe o parâmetro code na rota.
     // Caso exista, chama a função fetchData() para carregar
     // os dados indicados pelo parâmetro para edição
-    if(params.id) fetchData()
+    fetchData(params.id_publisher)
   }, [])
 
-  async function fetchData() {
+  async function fetchData(isUpdating) {
     // Exibe o backdrop para indicar que uma operação está ocorrendo
     // em segundo plano
     setState({ ...state, showWaiting: true })
     try {
-      const result = await myfetch.get(`customer/${params.id}`)
-      
-      // É necesário converter a data de nascimento de string para data
-      // antes de carregá-la no componente DatePicker
-      result.birth_date = parseISO(result.birth_date)
 
-      setState({ ...state, showWaiting: false, customer: result })
-      
+      let publisher = publisherDefaults
+
+      // Se estivermos no modo de atualização, devemos carregar o
+      // registro indicado no parâmetro da rota 
+      if(isUpdating) {
+        publisher = await myfetch.get(`publisher/${params.id_publisher}`)
+        // publisher.selling_date = parseISO(publisher.selling_date)
+      }
+
+      // // Busca a listagem de clientes para preencher o componente
+      // // de escolha
+      // let publisher_id = await myfetch.get('publisher_id')
+
+      // // Cria um cliente "fake" que permite não selecionar nenhum
+      // // cliente
+      // publisher_id.unshift({id: null, name_publisher: '(Sem Editora)'})
+
+      // setState({ ...state, showWaiting: false, publisher, publisher_id })
+      setState({ ...state, showWaiting: false, publisher})
+
     } 
     catch(error) {
       setState({ ...state, 
@@ -112,13 +111,12 @@ export default function CustomersForm() {
   }
 
   function handleFieldChange(event) {
-    console.log(event)
-    const newCustomer = { ...customer }
-    newCustomer[event.target.name] = event.target.value
-    
+    const newPublisher = { ...publisher }
+    newPublisher[event.target.name] = event.target.value
+
     setState({ 
       ...state, 
-      customer: newCustomer,
+      publisher: newPublisher,
       isFormModified: true      // O formulário foi alterado
     })
   }
@@ -126,34 +124,29 @@ export default function CustomersForm() {
   async function handleFormSubmit(event) {
     setState({ ...state, showWaiting: true }) // Exibe o backdrop
     event.preventDefault(false)   // Evita o recarregamento da página
+  
     try {
 
-      console.log({customer})
+      console.log({publisher})
 
       // Chama a validação da biblioteca Zod
-      Customer.parse(customer)
+      // publisher.parse(publisher)
 
-      let result
-
-      // Se existir o campo id no json de dados, chama o método PUT
-      // para alteração
-      if(customer.id) result = await myfetch.put(`customer/${customer.id}`, customer)
-
-      // Senão, chama o método POST para criar um novo registro
-      else result = await myfetch.post('customer', customer)
-      
+      let result 
+      // se id então put para atualizar
+      if(publisher.id_publisher) result = await myfetch.put(`publisher/${publisher.id_publisher}`, publisher)
+      //senão post para criar novo 
+      else result = await myfetch.post('publisher', publisher)
       setState({ ...state, 
         showWaiting: false, // Esconde o backdrop
         notification: {
           show: true,
           severity: 'success',
-          message: 'Dados salvos com sucesso.',
-          validationErrors: {}
+          message: 'Dados salvos com sucesso.'
         }  
       })  
     }
     catch(error) {
-
       if(error instanceof ZodError) {
         console.error(error)
 
@@ -215,12 +208,14 @@ export default function CustomersForm() {
     // Fechamos a caixa de diálogo
     setState({ ...state, openDialog: false })
 
-    // Se o usuário tiver respondido se quer voltar à página
+    // Se o usuário tiver respondido quer quer voltar à página
     // de listagem mesmo com alterações pendentes, faremos a
     // vontade dele
     if(answer) navigate('..', { relative: 'path' })
   }
-
+  
+  const statePublisher= ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
+  
   return(
     <>
 
@@ -241,8 +236,13 @@ export default function CustomersForm() {
         onClose={handleNotificationClose}
       /> 
 
-      <Typography variant="h1" sx={{ mb: '50px' }}>
-        Cadastro de clientes
+      <Typography variant="h1" sx={{ 
+        mb: '50px' , 
+        display:'flex', 
+        justifyContent:'center', 
+        fontFamily:'ITC Benguiat',
+        color:'#ffb48a'}}>
+        Cadastro de Livros
       </Typography>
 
       <form onSubmit={handleFormSubmit}>
@@ -250,184 +250,48 @@ export default function CustomersForm() {
         <Box className="form-fields">
         
           <TextField 
-            id="name"
-            name="name" 
-            label="Nome completo" 
+            id="name_publisher"
+            name="name_publisher" 
+            label="Nome da Editora" 
             variant="filled"
             required
             fullWidth
-            value={customer.name}
+            value={publisher.name_publisher}
             onChange={handleFieldChange}
             autoFocus
-            error={validationErrors?.name}
-            helperText={validationErrors?.name}
           />
 
-          <InputMask
-            mask="999.999.999-99"
-            maskChar=" "
-            value={customer.ident_document}
-            onChange={handleFieldChange}
-          >
-            {
-              () => <TextField 
-                id="ident_document"
-                name="ident_document" 
-                label="CPF" 
-                variant="filled"
-                required
-                fullWidth
-                error={validationErrors?.ident_document}
-                helperText={validationErrors?.ident_document}
-              />
-            }
-          </InputMask>
-
-          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptLocale}>
-            <DatePicker
-              label="Data de nascimento"
-              value={customer.birth_date}
-              onChange={ value => 
-                handleFieldChange({ target: { name: 'birth_date', value } }) 
-              }
-              slotProps={{ textField: { 
-                variant: 'filled', 
-                fullWidth: true,
-                error: validationErrors?.birth_date,
-                helperText: validationErrors?.birth_date
-              }}}
-            />
-          </LocalizationProvider>
-
           <TextField 
-            id="street_name"
-            name="street_name" 
-            label="Logradouro (Rua, Av., etc.)" 
+            id="city_publisher"
+            name="city_publisher" 
+            label="Cidade" 
             variant="filled"
             required
             fullWidth
-            placeholder="Ex.: Rua Principal"
-            value={customer.street_name}
+            value={publisher.city_publisher}
             onChange={handleFieldChange}
-            error={validationErrors?.street_name}
-            helperText={validationErrors?.street_name}
           />
-
-          <TextField 
-            id="house_number"
-            name="house_number" 
-            label="Nº" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.house_number}
-            onChange={handleFieldChange}
-            error={validationErrors?.house_number}
-            helperText={validationErrors?.house_number}
-          />
-
-          <TextField 
-            id="complements"
-            name="complements" 
-            label="Complemento" 
-            variant="filled"
-            fullWidth
-            placeholder="Apto., bloco, casa, etc."
-            value={customer.complements}
-            onChange={handleFieldChange}
-            error={validationErrors?.complements}
-            helperText={validationErrors?.complements}
-          />
-
-          <TextField 
-            id="neighborhood"
-            name="neighborhood" 
-            label="Bairro" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.neighborhood}
-            onChange={handleFieldChange}
-            error={validationErrors?.neighborhood}
-            helperText={validationErrors?.neighborhood}
-          />
-          
-          <TextField 
-            id="municipality"
-            name="municipality" 
-            label="Município" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.municipality}
-            onChange={handleFieldChange}
-            error={validationErrors?.municipality}
-            helperText={validationErrors?.municipality}
-          />
-
+            
           <TextField
-            id="state"
-            name="state"
-            select
-            label="UF"
-            variant="filled"
+            id="state_publisher"
+            name="state_publisher" 
+            label="Estado"
+            defaultValue=""
             fullWidth
+            select
             required
-            value={customer.state}
+            variant="filled"
+            value={publisher.state_publisher}
             onChange={handleFieldChange}
-            error={validationErrors?.state}
-            helperText={validationErrors?.state}
           >
-            {states.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+            {statePublisher.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
               </MenuItem>
             ))}
           </TextField>
-
-          <InputMask
-            mask="(99) _9999-9999"
-            formatChars={maskFormatChars}
-            maskChar="_"
-            value={customer.phone}
-            onChange={handleFieldChange}
-          >
-            {
-              () => <TextField 
-                id="phone"
-                name="phone" 
-                label="Celular / Telefone de contato" 
-                variant="filled"
-                required
-                fullWidth
-                value={customer.phone}
-                onChange={handleFieldChange}
-                error={validationErrors?.phone}
-                helperText={validationErrors?.phone}
-              />
-            }
-          </InputMask>
-
-          <TextField 
-            id="email"
-            name="email" 
-            label="E-mail" 
-            variant="filled"
-            required
-            fullWidth
-            value={customer.email}
-            onChange={handleFieldChange}
-            error={validationErrors?.email}
-            helperText={validationErrors?.email}
-          />
           
-        </Box>
-
-        <Box sx={{ fontFamily: 'monospace' }}>
-          { JSON.stringify(customer) }
-        </Box>
-
-        <Toolbar sx={{ justifyContent: "space-around" }}>
+          <Toolbar sx={{ justifyContent:'space-around', display:'flex' }}>
           <Button 
             variant="contained" 
             color="secondary" 
@@ -437,13 +301,20 @@ export default function CustomersForm() {
           </Button>
           
           <Button 
+            color="secondary"
             variant="outlined"
             onClick={handleBackButtonClose}
           >
             Voltar
           </Button>
         </Toolbar>
-      
+
+        </Box>
+
+        {/* <Box sx={{ fontFamily: 'monospace' }}>
+          { JSON.stringify(publisher) }
+        </Box> */}
+
       </form>
     </>
 
