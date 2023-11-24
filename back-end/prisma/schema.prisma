@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Book {
-  code          Int         @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   title         String
   author        String
   year          Int
@@ -28,7 +28,7 @@ enum BookStatus {
 }
 
 model Publisher {
-  id_publisher     Int      @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   name_publisher   String
   city_publisher   String
   state_publisher  String

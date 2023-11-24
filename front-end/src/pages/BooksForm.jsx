@@ -50,7 +50,7 @@ export default function BookForm() {
 
   const {
     book,
-    // publisher_id,
+    // id,
     showWaiting,
     notification,
     openDialog,
@@ -75,10 +75,10 @@ export default function BookForm() {
   // useEffect com vetor de dependências vazio. Será executado
   // uma vez, quando o componente for carregado
   React.useEffect(() => {
-    // Verifica se existe o parâmetro code na rota.
+    // Verifica se existe o parâmetro id na rota.
     // Caso exista, chama a função fetchData() para carregar
     // os dados indicados pelo parâmetro para edição
-    fetchData(params.code)
+    fetchData(params.id)
   }, [])
 
   async function fetchData(isUpdating) {
@@ -92,19 +92,19 @@ export default function BookForm() {
       // Se estivermos no modo de atualização, devemos carregar o
       // registro indicado no parâmetro da rota 
       if(isUpdating) {
-        book = await myfetch.get(`book/${params.code}`)
+        book = await myfetch.get(`book/${params.id}`)
         // book.selling_date = parseISO(book.selling_date)
       }
 
       // // Busca a listagem de clientes para preencher o componente
       // // de escolha
-      // let publisher_id = await myfetch.get('publisher_id')
+      // let id = await myfetch.get('id')
 
       // // Cria um cliente "fake" que permite não selecionar nenhum
       // // cliente
-      // publisher_id.unshift({id: null, name_publisher: '(Sem Editora)'})
+      // id.unshift({id: null, name_publisher: '(Sem Editora)'})
 
-      // setState({ ...state, showWaiting: false, book, publisher_id })
+      // setState({ ...state, showWaiting: false, book, id })
       setState({ ...state, showWaiting: false, book})
 
     } 
@@ -144,7 +144,7 @@ export default function BookForm() {
 
       let result 
       // se id então put para atualizar
-      if(book.code) result = await myfetch.put(`book/${book.code}`, book)
+      if(book.id) result = await myfetch.put(`book/${book.id}`, book)
       //senão post para criar novo 
       else result = await myfetch.post('book', book)
       setState({ ...state, 
@@ -312,8 +312,8 @@ export default function BookForm() {
           />
 
           {/* <TextField
-            id="publisher_id"
-            name="publisher_id" 
+            id="id"
+            name="id" 
             label="Editora"
             select
             defaultValue=""
@@ -323,9 +323,9 @@ export default function BookForm() {
             value={book.customer_id}
             onChange={handleFieldChange}
           >
-            {publisher_id.map(publisher_id => (
-              <MenuItem key={publisher_id.id_publisher} value={publisher_id.id_publisher}>
-                {publisher_id.name_publisher}
+            {id.map(id => (
+              <MenuItem key={id.id} value={id.id}>
+                {id.name_publisher}
               </MenuItem>
             ))}
           </TextField> */}

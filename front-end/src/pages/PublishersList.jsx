@@ -73,7 +73,7 @@ export default function PublishersList() {
   }
 
   const columns = [
-    { field: 'id_publisher', headerName: 'ID', width: 90 },
+    { field: 'id', headerName: 'ID', width: 90 },
     { field: 'name_publisher', headerName: 'Editora', width: 150 },
     { field: 'city_publisher', headerName: 'Cidade', align: 'left', headerAlign: 'left', width: 150 },
     { field: 'state_publisher', headerName: 'Estado', width: 150 },
@@ -84,7 +84,7 @@ export default function PublishersList() {
       align: 'left',
       width: 90,
       renderCell: (params) => (
-        <Link to={'./' + params.id_publisher}>
+        <Link to={'./' + params.id}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>
@@ -98,15 +98,15 @@ export default function PublishersList() {
       align: 'left',
       width: 90,
       renderCell: (params) => (
-        <IconButton aria-label="Excluir" onClick={() => handleDeleteButtonClick(params.id_publisher)}>
+        <IconButton aria-label="Excluir" onClick={() => handleDeleteButtonClick(params.id)}>
           <DeleteForeverIcon color="error" />
         </IconButton>
       ),
     },
   ];
 
-  function handleDeleteButtonClick(id_publisher) {
-    setState({ ...state, deleteId: id_publisher, openDialog: true });
+  function handleDeleteButtonClick(id) {
+    setState({ ...state, deleteId: id, openDialog: true });
   }
 
   async function handleDialogClose(answer) {

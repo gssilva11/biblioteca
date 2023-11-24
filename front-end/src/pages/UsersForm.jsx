@@ -25,7 +25,7 @@ export default function UserForm() {
   const userDefaults = {
     email: '',
     name: '',
-    code: '',
+    id: '',
     phone: '',
     city: '',
     state: '',
@@ -283,14 +283,14 @@ export default function UserForm() {
           />
 
           <TextField
-            id="code"
-            name="code" 
+            id="id"
+            name="id" 
             label="Code"
             defaultValue=""
             fullWidth
             required
             variant="filled"
-            value={user.code}
+            value={user.id}
             onChange={handleFieldChange}
           />
 

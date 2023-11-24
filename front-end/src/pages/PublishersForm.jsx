@@ -29,7 +29,8 @@ export default function PublisherForm() {
 
   const publisherDefaults = {
     name_publisher: '',
-    city_publisher: ''
+    city_publisher: '',
+    state_publisher:''
   }
 
   const [state, setState] = React.useState({
@@ -47,7 +48,7 @@ export default function PublisherForm() {
 
   const {
     publisher,
-    // publisher_id,
+    // id,
     showWaiting,
     notification,
     openDialog,
@@ -68,7 +69,7 @@ export default function PublisherForm() {
     // Verifica se existe o parâmetro code na rota.
     // Caso exista, chama a função fetchData() para carregar
     // os dados indicados pelo parâmetro para edição
-    fetchData(params.id_publisher)
+    fetchData(params.id)
   }, [])
 
   async function fetchData(isUpdating) {
@@ -82,19 +83,19 @@ export default function PublisherForm() {
       // Se estivermos no modo de atualização, devemos carregar o
       // registro indicado no parâmetro da rota 
       if(isUpdating) {
-        publisher = await myfetch.get(`publisher/${params.id_publisher}`)
+        publisher = await myfetch.get(`publisher/${params.id}`)
         // publisher.selling_date = parseISO(publisher.selling_date)
       }
 
       // // Busca a listagem de clientes para preencher o componente
       // // de escolha
-      // let publisher_id = await myfetch.get('publisher_id')
+      // let id = await myfetch.get('id')
 
       // // Cria um cliente "fake" que permite não selecionar nenhum
       // // cliente
-      // publisher_id.unshift({id: null, name_publisher: '(Sem Editora)'})
+      // id.unshift({id: null, name_publisher: '(Sem Editora)'})
 
-      // setState({ ...state, showWaiting: false, publisher, publisher_id })
+      // setState({ ...state, showWaiting: false, publisher, id })
       setState({ ...state, showWaiting: false, publisher})
 
     } 
@@ -134,7 +135,7 @@ export default function PublisherForm() {
 
       let result 
       // se id então put para atualizar
-      if(publisher.id_publisher) result = await myfetch.put(`publisher/${publisher.id_publisher}`, publisher)
+      if(publisher.id) result = await myfetch.put(`publisher/${publisher.id}`, publisher)
       //senão post para criar novo 
       else result = await myfetch.post('publisher', publisher)
       setState({ ...state, 

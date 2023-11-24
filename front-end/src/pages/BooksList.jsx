@@ -87,7 +87,7 @@ export default function BooksList() {
   }
 
   const columns = [
-    { field: 'code', headerName: 'Código', width: 90 },
+    { field: 'id', headerName: 'Código', width: 90 },
     {
       field: 'title',
       headerName: 'Título',
@@ -122,7 +122,7 @@ export default function BooksList() {
       align: 'left',
       width: 90,
       renderCell: params =>
-        <Link to={'./' + params.code}>
+        <Link to={'./' + params.id}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>
@@ -137,15 +137,15 @@ export default function BooksList() {
       renderCell: params =>
         <IconButton 
           aria-label="Excluir"
-          onClick={() => handleDeleteButtonClick(params.code)}
+          onClick={() => handleDeleteButtonClick(params.id)}
         >
           <DeleteForeverIcon color="error" />
         </IconButton>
     }
   ];
 
-  function handleDeleteButtonClick(code) {
-    setState({ ...state, deleteId: code, openDialog: true })
+  function handleDeleteButtonClick(id) {
+    setState({ ...state, deleteId: id, openDialog: true })
   }
 
   async function handleDialogClose(answer) {
@@ -247,7 +247,7 @@ export default function BooksList() {
             </TableHead>
             <TableBody>
               {books.map((row) => (
-                <TableRow key={row.code}>
+                <TableRow key={row.id}>
                   {columns.map((column) => (
                     <TableCell key={column.field} sx={{ borderBottom: '1px solid #e0e0e0', padding: '16px', color: '#fff' }}>
                       {column.renderCell ? column.renderCell(row) : row[column.field]}
